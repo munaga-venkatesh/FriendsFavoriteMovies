@@ -18,43 +18,38 @@ struct MovieList: View {
     var body: some View {
         NavigationSplitView {
             VStack {
-                List(movies) { movie in
-                    NavigationLink(movie.title) {
-                        Text("Detail view for \(movie.title)")
-                            .navigationTitle("Movie")
-                            .navigationBarTitleDisplayMode(.inline)
-                    }
-                }
-                
-                VStack {
-                    DatePicker(
-                        selection: $newDate,
-                        in: Date.distantPast...Date.distantFuture,
-                        displayedComponents: .date
-                    ) {
-                        TextField("Add title", text: $title)
-                            .textFieldStyle(.roundedBorder)
-                    }
-                    
-                    Button("Add") {
-                        if title.count >= 2 {
-                            context.insert(Movie(title: title, releaseDate: newDate))
-                            title = ""
+                List {
+                    ForEach(movies) { movie in
+                        NavigationLink(movie.title) {
+                            MovieDetail(movie: movie)
                         }
                     }
-                    .bold()
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .buttonStyle(.bordered)
-                    .tint(.accentColor)
+                    .onDelete(perform: deleteMovies(indexes:))
                 }
-                .padding()
             }
             .navigationTitle("Movies")
+            .toolbar {
+                ToolbarItem {
+                    Button("Add movie", systemImage: "plus", action: addMovie)
+                }
+                ToolbarItem {
+                    EditButton()
+                }
+            }
         } detail: {
             Text("Select a Moive")
                 .navigationTitle("Movie")
                 .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+    
+    private func addMovie() {
+        context.insert(Movie(title: "New Movie", releaseDate: .now))
+    }
+    
+    private func deleteMovies(indexes: IndexSet) {
+        for index in indexes {
+            context.delete(movies[index])
         }
     }
 }

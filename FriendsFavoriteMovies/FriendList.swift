@@ -16,44 +16,37 @@ struct FriendList: View {
     
     var body: some View {
         NavigationSplitView {
-            VStack {
-                List(friends) { friend in
+            List {
+                ForEach(friends) { friend in
                     NavigationLink(friend.name) {
-                        Text("Detail view for \(friend.name)")
-                            .navigationTitle("Friend")
-                            .navigationBarTitleDisplayMode(.inline)
+                        FriendDetail(friend: friend)
                     }
                 }
-                
-                HStack {
-                    TextField("Add friend name", text: $name)
-                        .textFieldStyle(.roundedBorder)
-                        .onSubmit {
-                            if name.count > 2 {
-                                context.insert(Friend(name: name))
-                                name = ""
-                            }
-                        }
-                    
-                    Button("Add") {
-                        if name.count > 2 {
-                            context.insert(Friend(name: name))
-                            name = ""
-                        }
-                    }
-                    .bold()
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .buttonStyle(.bordered)
-                    .tint(.accentColor)
-                }
-                .padding()
+                .onDelete(perform: deleteFriends(indexes:))
             }
             .navigationTitle("Friends")
+            .toolbar {
+                ToolbarItem {
+                    Button("Add friend", systemImage: "plus", action: addFriend)
+                }
+                ToolbarItem {
+                    EditButton()
+                }
+            }
         } detail: {
             Text("Select a friend")
                 .navigationTitle("Friend")
                 .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+    
+    private func addFriend() {
+        context.insert(Friend(name: "New Friend"))
+    }
+    
+    private func deleteFriends(indexes: IndexSet) {
+        for index in indexes {
+            context.delete(friends[index])
         }
     }
 }

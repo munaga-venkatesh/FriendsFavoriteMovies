@@ -18,6 +18,14 @@ class SampleData {
         modelContainer.mainContext
     }
     
+    var friend: Friend {
+        Friend.sampleData.first ?? Friend(name: "Venkatesh")
+    }
+    
+    var movie: Movie {
+        Movie.sampleData.first ?? Movie(title: "Movie Name", releaseDate: Date.now)
+    }
+    
     private init() {
         let schema = Schema([
             Friend.self,
