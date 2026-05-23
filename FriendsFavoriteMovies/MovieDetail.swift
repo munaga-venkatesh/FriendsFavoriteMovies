@@ -21,12 +21,26 @@ struct MovieDetail: View {
         self.isNew = isNew
     }
     
+    var sortedFriends: [Friend] {
+        movie.favoritedBy.sorted { first, second in
+            first.name < second.name
+        }
+    }
+    
     var body: some View {
         Form {
-            TextField(movie.title, text: $movie.title)
+            TextField("Movie title", text: $movie.title)
                 .autocorrectionDisabled()
             
             DatePicker("Release date", selection: $movie.releaseDate, displayedComponents: .date)
+            
+            if !movie.favoritedBy.isEmpty {
+                Section("Favorited By") {
+                    ForEach(sortedFriends) { friend in
+                        Text(friend.name)
+                    }
+                }
+            }
         }
         .navigationTitle(isNew ? "New Movie" : "Movie")
         .navigationBarTitleDisplayMode(.inline)
@@ -51,11 +65,13 @@ struct MovieDetail: View {
 #Preview {
     NavigationStack {
         MovieDetail(movie: SampleData.shared.movie)
+            .modelContainer(SampleData.shared.modelContainer)
     }
 }
 
 #Preview("New Movie") {
     NavigationStack {
         MovieDetail(movie: SampleData.shared.movie, isNew: true)
+            .modelContainer(SampleData.shared.modelContainer)
     }
 }

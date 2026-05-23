@@ -10,11 +10,13 @@ import SwiftData
 
 struct FriendDetail: View {
     @Bindable var friend: Friend
+    let isNew: Bool
     
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var context
     
-    let isNew: Bool
+    @Query(sort: \Movie.title) private var movies: [Movie]
+    
     
     init(friend: Friend, isNew: Bool = false) {
         self.friend = friend
@@ -23,8 +25,18 @@ struct FriendDetail: View {
     
     var body: some View {
         Form {
-            TextField(friend.name, text: $friend.name)
+            TextField("Name", text: $friend.name)
                 .autocorrectionDisabled()
+            
+            Picker("Favorite Movie", selection: $friend.favoriteMovie) {
+                Text("None")
+                    .tag(nil as Movie?)
+                
+                ForEach(movies) { movie in
+                    Text(movie.title)
+                        .tag(movie)
+                }
+            }
         }
         .navigationTitle(isNew ? "New Friend": "Friend")
         .navigationBarTitleDisplayMode(.inline)
@@ -49,11 +61,13 @@ struct FriendDetail: View {
 #Preview {
     NavigationStack {
         FriendDetail(friend: SampleData.shared.friend)
+            .modelContainer(SampleData.shared.modelContainer)
     }
 }
 
 #Preview("New Friend") {
     NavigationStack {
         FriendDetail(friend: SampleData.shared.friend, isNew: true)
+            .modelContainer(SampleData.shared.modelContainer)
     }
 }
